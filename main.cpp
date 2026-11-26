@@ -99,9 +99,7 @@ void DFS_dop(const std::vector<std::vector<int>>& matrix,std::vector<bool>& NUM,
 int main(){
     srand(time(NULL));
     int n;
-    clock_t start,end;
     std::cout<<"Введите количество вершин: ";
-    start=clock();
     if(!(std::cin>>n)||n<=0){
         std::cout<<"НЕ ВЕРНЫЙ ВВОД.\nРАЗМЕР ДОЛЖЕН БЫТЬ ЧИСЛОМ БОЛЬШЕ НУЛЯ\n";
         return 1;
@@ -119,11 +117,55 @@ int main(){
     std::cout<<"\n";
     std::cout<<"МАТРИЦА СМЕЖНОСТИ:\n";
     print_matrix(matrix);
+
+    //задание
+    bool has_edges=false;
+
+    for(int i=0;i<n;i++){
+        for(int j=i+1;j<n;j++){
+            if(matrix[i][j]==1){
+                has_edges=true;
+            }
+        }
+    }
+
+    if(!has_edges){
+        std::cout<<"В графе нет ребер. Можно начать с любой вершины.\n";
+    }
+
+    int start;
+
+    while(true){
+        std::cout<<"Введите начальную вершину от 1 до "<<n<<": ";
+
+        if(!(std::cin>>start)||start<1||start>n){
+            std::cout<<"НЕВЕРНЫЙ НОМЕР ВЕРШИНЫ!\n";
+            return 1;
+        }
+
+        bool isolated=true;
+
+        for(int j=0;j<n;j++){
+            if(matrix[start-1][j]==1){
+                isolated=false;
+                break;
+            }
+        }
+
+        if(!isolated||!has_edges){
+            break;
+        }
+
+        std::cout<<"Вершина изолирована. Выбери другую.\n";
+    }
     
     std::vector<bool> NUM(n,false);
-    
+
     std::cout<<"\n";
     std::cout<<"ОБХОД ГРАФА В ГЛУБИНУ:\n";
+
+    DFS(matrix,NUM,start-1);
+
     for(size_t i=0;i<NUM.size();i++){
         if(!NUM[i]){
             DFS(matrix,NUM,i);
@@ -139,22 +181,25 @@ int main(){
 
     std::cout<<"\n";
     std::cout<<"ОБХОД В ГЛУБИНУ ПО СПИСКУ СМЕЖНОСТИ:\n";
+
+    DFS_spisok(spisok,NUM,start-1);
+
     for(size_t i=0;i<NUM.size();i++){
         if(!NUM[i]){
             DFS_spisok(spisok,NUM,i);
         }
-    }   
-    
+    }
+
     NUM.assign(n,false);
 
     std::cout<<"\n";
     std::cout<<"НЕРЕКУРСИВНЫЙ ОБХОД ПО МАТРИЦЕ:\n";
 
+    DFS_dop(matrix,NUM,start-1);
+
     for(size_t i=0;i<NUM.size();i++){
         if(!NUM[i]){
             DFS_dop(matrix,NUM,i);
         }
-    } 
-    end=clock();   
-    std::cout << "ОБщее время всех обходов: "<<(double)(end - start)/CLOCKS_PER_SEC << "\n";
+    }
 }
